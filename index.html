@@ -116,10 +116,10 @@
                     return false;
                 });
 
+                var currentColourInput = "rgba";
+
                 // every 25 milliseconds, update our colour
                 setInterval(updateColour, 25);
-
-                var currentColourInput = "rgba";
 
                 // show the correct controls when a colour button is clicked
                 $(".colour-button").click(function()
@@ -137,6 +137,11 @@
 
                 // select rgba colour input type by default
                 $(".colour-button[data-type='rgba']").click();
+
+                // start out with a random colour by default for fun
+                $("#rgba-r-input").val(Math.floor((Math.random() * 255)));
+                $("#rgba-g-input").val(Math.floor((Math.random() * 255)));
+                $("#rgba-b-input").val(Math.floor((Math.random() * 255)));
 
                 var oldColour;
 
