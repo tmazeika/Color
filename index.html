@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+
+        <style>
+            html, body {
+                background-color: #000;
+                font-family: monospace;
+
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+
+            .colour-bg {
+                background-color: rgba(0, 0, 0, 0);
+
+                transition: background-color .5s;
+
+                width: 100%;
+                height: 100%;
+                position: absolute;
+            }
+
+            .colour-container {
+                text-align: center;
+                color: #FFF;
+                text-shadow: 0 0 3px #000;
+
+                margin: 0 -50% 0 0;
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+            .colour-input {
+                margin: 0;
+                padding: 0;
+            }
+        </style>
+
+        <title>Colour</title>
+    </head>
+
+    <body>
+        <div class="colour-bg">
+            <div class="colour-container">
+                <form>
+                    <input class="colour-input" id="r-input" type="range" value="0" min="0" max="255"/>
+                    <input class="colour-input" id="g-input" type="range" value="0" min="0" max="255"/>
+                    <input class="colour-input" id="b-input" type="range" value="0" min="0" max="255"/>
+                    <input class="colour-input" id="a-input" type="range" value="100" min="0" max="100"/>
+                </form>
+
+                <br/>
+
+                <span id="colour-hex"></span>
+                <br/><br/>
+                <span id="colour-rgba"></span>
+                <br/><br/>
+                <span id="colour-hsla"></span>
+            </div>
+        </div>
+
+        <script src="//code.jquery.com/jquery-2.1.3.min.js"></script>
+        <script src="//code.jquery.com/color/jquery.color-2.1.2.min.js"></script>
+        <script>
+            $(function() {
+                setInterval(updateColour, 25);
+
+                $(".colour-input").on("change", function() {
+                    updateColour()
+                });
+
+                var oldColour;
+
+                function updateColour() {
+                    var r = parseInt($("#r-input").val());
+                    var g = parseInt($("#g-input").val());
+                    var b = parseInt($("#b-input").val());
+                    var a = parseInt($("#a-input").val()) / 100;
+
+                    var colour = $.Color(r, g, b, a);
+
+                    if ( ! oldColour || r != oldColour.r || g != oldColour.g || b != oldColour.b || a != oldColour.a) {
+                        oldColour = { r: r, g: g, b: b, a: a };
+                    } else {
+                        return;
+                    }
+
+                    $(".colour-bg").css("background-color", colour.toRgbaString());
+                    $("#colour-hex").text(colour.toHexString(true).toUpperCase() + " / " + colour.toHexString().toUpperCase());
+                    $("#colour-rgba").text(colour.toRgbaString());
+                    $("#colour-hsla").text(colour.toHslaString())
+                }
+            });
+        </script>
+    </body>
+
+</html>
+
+
