@@ -6,7 +6,7 @@
         <meta charset="UTF-8">
 
         <style>
-            html, body {
+            :root, body {
                 background-color: #FEFEFE;
                 background-image: linear-gradient(45deg, #CBCBCB 25%, transparent 25%, transparent 75%, #CBCBCB 75%, #CBCBCB), linear-gradient(45deg, #CBCBCB 25%, transparent 25%, transparent 75%, #CBCBCB 75%, #CBCBCB);
                 background-image: -moz-linear-gradient(45deg, #CBCBCB 25%, transparent 25%, transparent 75%, #CBCBCB 75%, #CBCBCB), -moz-linear-gradient(45deg, #CBCBCB 25%, transparent 25%, transparent 75%, #CBCBCB 75%, #CBCBCB);
@@ -49,9 +49,21 @@
                 transform: translate(-50%, -50%);
             }
 
-            .colour-input {
-                margin: 0;
-                padding: 0;
+            .colour-button {
+                background-color: #FFF;
+                border: none;
+                border-bottom: 3px solid rgba(0, 0, 0, .25);
+                border-radius: 3px;
+                color: #000;
+                font-family: inherit;
+                font-size: inherit;
+                outline: none;
+
+                padding: .5em;
+            }
+
+            .colour-button.active {
+                border-bottom: none;
             }
         </style>
 
@@ -61,11 +73,28 @@
     <body>
         <div class="colour-bg">
             <div class="colour-container">
+                <button class="colour-button" data-type="hex">Hex</button>
+                <button class="colour-button" data-type="rgba">RGBA</button>
+                <button class="colour-button" data-type="hsla">HSLA</button>
+
+                <br/><br/>
+
                 <form>
-                    <input class="colour-input" id="r-input" type="range" value="0" min="0" max="255"/>
-                    <input class="colour-input" id="g-input" type="range" value="0" min="0" max="255"/>
-                    <input class="colour-input" id="b-input" type="range" value="0" min="0" max="255"/>
-                    <input class="colour-input" id="a-input" type="range" value="100" min="0" max="100"/>
+                    <div class="colour-inputs" data-type="hex">
+                        <input id="hex-input" value="#00000000" pattern="^#?[\da-fA-F]{3,8}$"/>
+                    </div>
+                    <div class="colour-inputs" data-type="rgba">
+                        <input id="rgba-r-input" type="range" value="0" min="0" max="255"/>
+                        <input id="rgba-g-input" type="range" value="0" min="0" max="255"/>
+                        <input id="rgba-b-input" type="range" value="0" min="0" max="255"/>
+                        <input id="rgba-a-input" type="range" value="1" min="0" max="1" step="0.01"/>
+                    </div>
+                    <div class="colour-inputs" data-type="hsla">
+                        <input id="hsla-h-input" type="range" value="0" min="0" max="359"/>
+                        <input id="hsla-s-input" type="range" value="0" min="0" max="1" step="0.01"/>
+                        <input id="hsla-l-input" type="range" value="0" min="0" max="1" step="0.01"/>
+                        <input id="hsla-a-input" type="range" value="1" min="0" max="1" step="0.01"/>
+                    </div>
                 </form>
 
                 <br/>
@@ -82,28 +111,124 @@
         <script src="//code.jquery.com/color/jquery.color-2.1.2.min.js"></script>
         <script>
             $(function() {
+                // don't make a form refresh the page when 'enter' is hit
+                $("form").submit(function() {
+                    return false;
+                });
+
+                // every 25 milliseconds, update our colour
                 setInterval(updateColour, 25);
+
+                var currentColourInput = "rgba";
+
+                // show the correct controls when a colour button is clicked
+                $(".colour-button").click(function()
+                {
+                    currentColourInput = $(this).data("type");
+
+                    // remove all active buttons then add the class to the clicked button
+                    $(".colour-button").removeClass("active");
+                    $(this).addClass("active");
+
+                    // hide all inputs then show the one we need
+                    $(".colour-inputs").hide();
+                    $(".colour-inputs[data-type='" + currentColourInput + "']").show();
+                });
+
+                // select rgba colour input type by default
+                $(".colour-button[data-type='rgba']").click();
 
                 var oldColour;
 
-                function updateColour() {
-                    var r = parseInt($("#r-input").val());
-                    var g = parseInt($("#g-input").val());
-                    var b = parseInt($("#b-input").val());
-                    var a = parseInt($("#a-input").val()) / 100;
+                // read the inputted colour info and update
+                function updateColour()
+                {
+                    var colour;
 
-                    var colour = $.Color(r, g, b, a);
+                    // read the correct colour input type (rgba, hsla, or hex)
+                    switch (currentColourInput)
+                    {
+                        case "hex":
+                            var hex = $("#hex-input").val();
+                            var hexA = 1;
 
-                    if ( ! oldColour || r != oldColour.r || g != oldColour.g || b != oldColour.b || a != oldColour.a) {
-                        oldColour = { r: r, g: g, b: b, a: a };
-                    } else {
+                            if (hex.charAt(0) !== '#')
+                            {
+                                hex = '#' + hex;
+                            }
+
+                            // if we have information about the alpha, use it
+                            if (hex.length === 8 || hex.length === 9)
+                            {
+                                // get the last 1 or 2 characters to get the alpha info
+                                var lastSubStr = hex.substr(hex.length - (hex.length === 8 ? 1 : 2));
+
+                                // convert the hex alpha info to decimal then get the percentage (for jQuery Color)
+                                hexA = parseInt(lastSubStr, 16) / 255;
+                            }
+
+                            colour = $.Color(hex);
+                            colour = colour.alpha(hexA);
+
+                            break;
+
+                        case "rgba":
+                            var rgbaR = $("#rgba-r-input").val();
+                            var rgbaG = $("#rgba-g-input").val();
+                            var rgbaB = $("#rgba-b-input").val();
+                            var rgbaA = $("#rgba-a-input").val();
+
+                            colour = $.Color(rgbaR, rgbaG, rgbaB, rgbaA);
+                            break;
+
+                        case "hsla":
+                            var hslaH = $("#hsla-h-input").val();
+                            var hslaS = $("#hsla-s-input").val();
+                            var hslaL = $("#hsla-l-input").val();
+                            var hslaA = $("#hsla-a-input").val();
+
+                            colour = $.Color({ hue: hslaH, saturation: hslaS, lightness: hslaL });
+                            colour = colour.alpha(hslaA);
+                            break;
+                    }
+
+                    // if this colour hasn't changed since last time, no need to update all the things
+                    if ( ! oldColour || colour.toHexString(true) !== oldColour.toHexString(true))
+                    {
+                        oldColour = colour;
+                    }
+                    else
+                    {
                         return;
                     }
 
+                    // update all inputs
+                    if (currentColourInput !== "hex")
+                    {
+                        $("#hex-input").val(colour.toHexString(true).toUpperCase());
+                    }
+
+                    if (currentColourInput !== "rgba")
+                    {
+                        $("#rgba-r-input").val(colour.red());
+                        $("#rgba-g-input").val(colour.green());
+                        $("#rgba-b-input").val(colour.blue());
+                        $("#rgba-a-input").val(colour.alpha());
+                    }
+
+                    if (currentColourInput !== "hsla")
+                    {
+                        $("#hsla-h-input").val(colour.hue());
+                        $("#hsla-s-input").val(colour.saturation());
+                        $("#hsla-l-input").val(colour.lightness());
+                        $("#hsla-a-input").val(colour.alpha());
+                    }
+
+                    // update all results
                     $(".colour-bg").css("background-color", colour.toRgbaString());
                     $("#colour-hex").text(colour.toHexString(true).toUpperCase() + " / " + colour.toHexString().toUpperCase());
                     $("#colour-rgba").text(colour.toRgbaString());
-                    $("#colour-hsla").text(colour.toHslaString())
+                    $("#colour-hsla").text(colour.toHslaString());
                 }
             });
         </script>
