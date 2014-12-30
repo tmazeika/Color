@@ -29,7 +29,7 @@
                 padding: 0;
             }
 
-            .colour-bg {
+            .color-bg {
                 transition: background-color .5s;
 
                 width: 100%;
@@ -37,7 +37,7 @@
                 position: absolute;
             }
 
-            .colour-container {
+            .color-container {
                 background-color: rgba(0, 0, 0, .5);
                 border-radius: 10px;
 
@@ -49,7 +49,7 @@
                 transform: translate(-50%, -50%);
             }
 
-            .colour-button {
+            .color-button {
                 background-color: #FFF;
                 border: none;
                 border-bottom: 3px solid rgba(0, 0, 0, .25);
@@ -62,34 +62,34 @@
                 padding: .5em;
             }
 
-            .colour-button.active {
+            .color-button.active {
                 background-color: #B3DEFF;
             }
         </style>
 
-        <title>Colour</title>
+        <title>Color</title>
     </head>
 
     <body>
-        <div class="colour-bg">
-            <div class="colour-container">
-                <button class="colour-button" data-type="hex">Hex</button>
-                <button class="colour-button" data-type="rgba">RGBA</button>
-                <button class="colour-button" data-type="hsla">HSLA</button>
+        <div class="color-bg">
+            <div class="color-container">
+                <button class="color-button" data-type="hex">Hex</button>
+                <button class="color-button" data-type="rgba">RGBA</button>
+                <button class="color-button" data-type="hsla">HSLA</button>
 
                 <br/><br/>
 
                 <form>
-                    <div class="colour-inputs" data-type="hex">
+                    <div class="color-inputs" data-type="hex">
                         <input id="hex-input" value="#00000000" pattern="^#?[\da-fA-F]{3,8}$"/>
                     </div>
-                    <div class="colour-inputs" data-type="rgba">
+                    <div class="color-inputs" data-type="rgba">
                         <input id="rgba-r-input" type="range" value="0" min="0" max="255"/>
                         <input id="rgba-g-input" type="range" value="0" min="0" max="255"/>
                         <input id="rgba-b-input" type="range" value="0" min="0" max="255"/>
                         <input id="rgba-a-input" type="range" value="1" min="0" max="1" step="0.01"/>
                     </div>
-                    <div class="colour-inputs" data-type="hsla">
+                    <div class="color-inputs" data-type="hsla">
                         <input id="hsla-h-input" type="range" value="0" min="0" max="359"/>
                         <input id="hsla-s-input" type="range" value="0" min="0" max="1" step="0.01"/>
                         <input id="hsla-l-input" type="range" value="0" min="0" max="1" step="0.01"/>
@@ -99,11 +99,11 @@
 
                 <br/>
 
-                <span id="colour-hex"></span>
+                <span id="color-hex"></span>
                 <br/><br/>
-                <span id="colour-rgba"></span>
+                <span id="color-rgba"></span>
                 <br/><br/>
-                <span id="colour-hsla"></span>
+                <span id="color-hsla"></span>
             </div>
         </div>
 
@@ -116,42 +116,42 @@
                     return false;
                 });
 
-                var currentColourInput = "rgba";
+                var currentColorInput = "rgba";
 
-                // every 25 milliseconds, update our colour
-                setInterval(updateColour, 25);
+                // every 25 milliseconds, update our color
+                setInterval(updateColor, 25);
 
-                // show the correct controls when a colour button is clicked
-                $(".colour-button").click(function()
+                // show the correct controls when a color button is clicked
+                $(".color-button").click(function()
                 {
-                    currentColourInput = $(this).data("type");
+                    currentColorInput = $(this).data("type");
 
                     // remove all active buttons then add the class to the clicked button
-                    $(".colour-button").removeClass("active");
+                    $(".color-button").removeClass("active");
                     $(this).addClass("active");
 
                     // hide all inputs then show the one we need
-                    $(".colour-inputs").hide();
-                    $(".colour-inputs[data-type='" + currentColourInput + "']").show();
+                    $(".color-inputs").hide();
+                    $(".color-inputs[data-type='" + currentColorInput + "']").show();
                 });
 
-                // select rgba colour input type by default
-                $(".colour-button[data-type='rgba']").click();
+                // select rgba color input type by default
+                $(".color-button[data-type='rgba']").click();
 
-                // start out with a random colour by default for fun
+                // start out with a random color by default for fun
                 $("#rgba-r-input").val(Math.floor(Math.random() * 255));
                 $("#rgba-g-input").val(Math.floor(Math.random() * 255));
                 $("#rgba-b-input").val(Math.floor(Math.random() * 255));
 
-                var oldColour;
+                var oldColor;
 
-                // read the inputted colour info and update
-                function updateColour()
+                // read the inputted color info and update
+                function updateColor()
                 {
-                    var colour;
+                    var color;
 
-                    // read the correct colour input type (rgba, hsla, or hex)
-                    switch (currentColourInput)
+                    // read the correct color input type (rgba, hsla, or hex)
+                    switch (currentColorInput)
                     {
                         case "hex":
                             var hex = $("#hex-input").val();
@@ -172,8 +172,8 @@
                                 hexA = parseInt(lastSubStr, 16) / 255;
                             }
 
-                            colour = $.Color(hex);
-                            colour = colour.alpha(hexA);
+                            color = $.Color(hex);
+                            color = color.alpha(hexA);
 
                             break;
 
@@ -183,7 +183,7 @@
                             var rgbaB = $("#rgba-b-input").val();
                             var rgbaA = $("#rgba-a-input").val();
 
-                            colour = $.Color(rgbaR, rgbaG, rgbaB, rgbaA);
+                            color = $.Color(rgbaR, rgbaG, rgbaB, rgbaA);
                             break;
 
                         case "hsla":
@@ -192,15 +192,15 @@
                             var hslaL = $("#hsla-l-input").val();
                             var hslaA = $("#hsla-a-input").val();
 
-                            colour = $.Color({ hue: hslaH, saturation: hslaS, lightness: hslaL });
-                            colour = colour.alpha(hslaA);
+                            color = $.Color({ hue: hslaH, saturation: hslaS, lightness: hslaL });
+                            color = color.alpha(hslaA);
                             break;
                     }
 
-                    // if this colour hasn't changed since last time, no need to update all the things
-                    if ( ! oldColour || colour.toHexString(true) !== oldColour.toHexString(true))
+                    // if this color hasn't changed since last time, no need to update all the things
+                    if ( ! oldColor || color.toHexString(true) !== oldColor.toHexString(true))
                     {
-                        oldColour = colour;
+                        oldColor = color;
                     }
                     else
                     {
@@ -208,32 +208,32 @@
                     }
 
                     // update all inputs
-                    if (currentColourInput !== "hex")
+                    if (currentColorInput !== "hex")
                     {
-                        $("#hex-input").val(colour.toHexString(true).toUpperCase());
+                        $("#hex-input").val(color.toHexString(true).toUpperCase());
                     }
 
-                    if (currentColourInput !== "rgba")
+                    if (currentColorInput !== "rgba")
                     {
-                        $("#rgba-r-input").val(colour.red());
-                        $("#rgba-g-input").val(colour.green());
-                        $("#rgba-b-input").val(colour.blue());
-                        $("#rgba-a-input").val(colour.alpha());
+                        $("#rgba-r-input").val(color.red());
+                        $("#rgba-g-input").val(color.green());
+                        $("#rgba-b-input").val(color.blue());
+                        $("#rgba-a-input").val(color.alpha());
                     }
 
-                    if (currentColourInput !== "hsla")
+                    if (currentColorInput !== "hsla")
                     {
-                        $("#hsla-h-input").val(colour.hue());
-                        $("#hsla-s-input").val(colour.saturation());
-                        $("#hsla-l-input").val(colour.lightness());
-                        $("#hsla-a-input").val(colour.alpha());
+                        $("#hsla-h-input").val(color.hue());
+                        $("#hsla-s-input").val(color.saturation());
+                        $("#hsla-l-input").val(color.lightness());
+                        $("#hsla-a-input").val(color.alpha());
                     }
 
                     // update all results
-                    $(".colour-bg").css("background-color", colour.toRgbaString());
-                    $("#colour-hex").text(colour.toHexString(true).toUpperCase() + " / " + colour.toHexString().toUpperCase());
-                    $("#colour-rgba").text(colour.toRgbaString());
-                    $("#colour-hsla").text(colour.toHslaString());
+                    $(".color-bg").css("background-color", color.toRgbaString());
+                    $("#color-hex").text(color.toHexString(true).toUpperCase() + " / " + color.toHexString().toUpperCase());
+                    $("#color-rgba").text(color.toRgbaString());
+                    $("#color-hsla").text(color.toHslaString());
                 }
             });
         </script>

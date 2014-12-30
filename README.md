@@ -1,4 +1,4 @@
-Colour
+Color
 ======
 
-A minimalistic colour picker.
+A minimalistic color picker.
