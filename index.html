@@ -104,6 +104,8 @@
                 <span id="color-rgba"></span>
                 <br/><br/>
                 <span id="color-hsla"></span>
+                <br/><br/>
+                <span id="color-rgba-vector"></span>
             </div>
         </div>
 
@@ -234,6 +236,13 @@
                     $("#color-hex").text(color.toHexString(true).toUpperCase() + " / " + color.toHexString().toUpperCase());
                     $("#color-rgba").text(color.toRgbaString());
                     $("#color-hsla").text(color.toHslaString());
+
+                    $("#color-rgba-vector").text(
+                            "rgb dec(" +
+                            Math.round(color.red() / 255 * 10000) / 10000 + "," +
+                            Math.round(color.green() / 255 * 10000) / 10000 + "," +
+                            Math.round(color.blue() / 255 * 10000) / 10000 + ")"
+                    );
                 }
             });
         </script>
