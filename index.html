@@ -6,20 +6,13 @@
         <meta charset="UTF-8">
 
         <style>
-            :root, body {
-                background-color: #FEFEFE;
+            html, body {
                 background-image: linear-gradient(45deg, #CBCBCB 25%, transparent 25%, transparent 75%, #CBCBCB 75%, #CBCBCB), linear-gradient(45deg, #CBCBCB 25%, transparent 25%, transparent 75%, #CBCBCB 75%, #CBCBCB);
-                background-image: -moz-linear-gradient(45deg, #CBCBCB 25%, transparent 25%, transparent 75%, #CBCBCB 75%, #CBCBCB), -moz-linear-gradient(45deg, #CBCBCB 25%, transparent 25%, transparent 75%, #CBCBCB 75%, #CBCBCB);
-                background-image: -ms-linear-gradient(45deg, #CBCBCB 25%, transparent 25%, transparent 75%, #CBCBCB 75%, #CBCBCB), -ms-linear-gradient(45deg, #CBCBCB 25%, transparent 25%, transparent 75%, #CBCBCB 75%, #CBCBCB);
-                background-image: -o-linear-gradient(45deg, #CBCBCB 25%, transparent 25%, transparent 75%, #CBCBCB 75%, #CBCBCB), -o-linear-gradient(45deg, #CBCBCB 25%, transparent 25%, transparent 75%, #CBCBCB 75%, #CBCBCB);
-                background-image: -webkit-linear-gradient(45deg, #CBCBCB 25%, transparent 25%, transparent 75%, #CBCBCB 75%, #CBCBCB), -webkit-linear-gradient(45deg, #CBCBCB 25%, transparent 25%, transparent 75%, #CBCBCB 75%, #CBCBCB);
-                background-size:30px 30px;
-                -moz-background-size: 30px 30px;
-                -webkit-background-size: 30px 30px;
                 background-position: 0 0, 15px 15px;
+                background-size: 30px 30px;
                 color: #FFF;
-                font-family: monospace;
-                font-size: 1.1em;
+                font-family: sans-serif;
+                font-size: .9em;
                 text-align: center;
                 text-shadow: 0 0 1px #000;
 
@@ -29,15 +22,13 @@
                 padding: 0;
             }
 
-            .color-bg {
-                transition: background-color .5s;
-
+            .color-preview {
                 width: 100%;
                 height: 100%;
                 position: absolute;
             }
 
-            .color-container {
+            .color-control-container {
                 background-color: rgba(0, 0, 0, .5);
                 border-radius: 10px;
 
@@ -49,12 +40,13 @@
                 transform: translate(-50%, -50%);
             }
 
-            .color-button {
+            .color-format-button {
                 background-color: #FFF;
                 border: none;
                 border-bottom: 3px solid rgba(0, 0, 0, .25);
                 border-radius: 3px;
                 color: #000;
+                cursor: pointer;
                 font-family: inherit;
                 font-size: inherit;
                 outline: none;
@@ -62,7 +54,7 @@
                 padding: .5em;
             }
 
-            .color-button.active {
+            .color-format-button.active {
                 background-color: #B3DEFF;
             }
         </style>
@@ -71,179 +63,259 @@
     </head>
 
     <body>
-        <div class="color-bg">
-            <div class="color-container">
-                <button class="color-button" data-type="hex">Hex</button>
-                <button class="color-button" data-type="rgba">RGBA</button>
-                <button class="color-button" data-type="hsla">HSLA</button>
+        <div class="color-preview">
+            <div class="color-control-container">
+                <button class="color-format-button" data-type="hex">
+                    Hex
+                </button>
+
+                <button class="color-format-button active" data-type="rgba">
+                    RGBA
+                </button>
+
+                <button class="color-format-button" data-type="hsla">
+                    HSLA
+                </button>
 
                 <br/><br/>
 
-                <form>
-                    <div class="color-inputs" data-type="hex">
-                        <input id="hex-input" value="#00000000" pattern="^#?[\da-fA-F]{3,8}$"/>
-                    </div>
-                    <div class="color-inputs" data-type="rgba">
-                        <input id="rgba-r-input" type="range" value="0" min="0" max="255"/>
-                        <input id="rgba-g-input" type="range" value="0" min="0" max="255"/>
-                        <input id="rgba-b-input" type="range" value="0" min="0" max="255"/>
-                        <input id="rgba-a-input" type="range" value="1" min="0" max="1" step="0.01"/>
-                    </div>
-                    <div class="color-inputs" data-type="hsla">
-                        <input id="hsla-h-input" type="range" value="0" min="0" max="359"/>
-                        <input id="hsla-s-input" type="range" value="0" min="0" max="1" step="0.01"/>
-                        <input id="hsla-l-input" type="range" value="0" min="0" max="1" step="0.01"/>
-                        <input id="hsla-a-input" type="range" value="1" min="0" max="1" step="0.01"/>
-                    </div>
-                </form>
-
-                <br/>
-
-                <span id="color-hex"></span>
-                <br/><br/>
-                <span id="color-rgba"></span>
-                <br/><br/>
-                <span id="color-hsla"></span>
-                <br/><br/>
-                <span id="color-rgb-dec"></span>
+                <div class="color-inputs" data-type="hex" hidden>
+                    <table>
+                        <tr>
+                            <td>Hex</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input id="hex-input" onchange="updateColor()" value="#00000000"/>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="color-inputs" data-type="rgba">
+                    <table>
+                        <tr>
+                            <td>Red</td>
+                            <td>Green</td>
+                            <td>Blue</td>
+                            <td>Alpha</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input id="rgba-r-input" type="range" onchange="updateColor()" value="0" min="0" max="255"/>
+                            </td>
+                            <td>
+                                <input id="rgba-g-input" type="range" onchange="updateColor()" value="0" min="0" max="255"/>
+                            </td>
+                            <td>
+                                <input id="rgba-b-input" type="range" onchange="updateColor()" value="0" min="0" max="255"/>
+                            </td>
+                            <td>
+                                <input id="rgba-a-input" type="range" onchange="updateColor()" value="1" min="0" max="1" step="0.01"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td id="rgba-r-output"></td>
+                            <td id="rgba-g-output"></td>
+                            <td id="rgba-b-output"></td>
+                            <td id="rgba-a-output"></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="color-inputs" data-type="hsla" hidden>
+                    <table>
+                        <tr>
+                            <td>Hue</td>
+                            <td>Saturation</td>
+                            <td>Lightness</td>
+                            <td>Alpha</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input id="hsla-h-input" type="range" onchange="updateColor()" value="0" min="0" max="359"/>
+                            </td>
+                            <td>
+                                <input id="hsla-s-input" type="range" onchange="updateColor()" value="0" min="0" max="1" step="0.01"/>
+                            </td>
+                            <td>
+                                <input id="hsla-l-input" type="range" onchange="updateColor()" value="0" min="0" max="1" step="0.01"/>
+                            </td>
+                            <td>
+                                <input id="hsla-a-input" type="range" onchange="updateColor()" value="1" min="0" max="1" step="0.01"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td id="hsla-h-output"></td>
+                            <td id="hsla-s-output"></td>
+                            <td id="hsla-l-output"></td>
+                            <td id="hsla-a-output"></td>
+                        </tr>
+                    </table>
+                </div>
             </div>
         </div>
 
         <script src="//code.jquery.com/jquery-2.1.3.min.js"></script>
         <script src="//code.jquery.com/color/jquery.color-2.1.2.min.js"></script>
         <script>
+            var ColorFormats = {
+                HEX: "hex",
+                RGBA: "rgba",
+                HSLA: "hsla"
+            };
+
+            var currentColorFormat = ColorFormats.RGBA;
+            var previousInputs;
+            var previousColor;
+            var currentColor;
+
+            function trackInput(e)
+            {
+                var lastVal;
+
+                setInterval(function() {
+                    var thisVal = $(e).val();
+
+                    if ( ! lastVal || lastVal !== thisVal) updateColor();
+
+                    lastVal = thisVal;
+                }, 10)
+            }
+
+            function rand(min, max)
+            {
+                return Math.floor( Math.random() * (max - min + 1) ) + min;
+            }
+
+            function toPercent(x)
+            {
+                return Math.round( x * 100 ) + "%";
+            }
+
+            // read the inputted color info and update
+            function updateColor()
+            {
+                // read the correct color input type (rgba, hsla, or hex)
+                switch (currentColorFormat)
+                {
+                    case ColorFormats.HEX:
+                        var hex = $("#hex-input").val();
+                        var hexA = 1;
+
+                        if (hex.charAt(0) !== "#")
+                        {
+                            hex = "#" + hex;
+                        }
+
+                        // if we have information about the alpha, use it
+                        if (hex.length === 8 || hex.length === 9)
+                        {
+                            // get the last 1 or 2 characters to get the alpha info
+                            var lastSubStr = hex.substr( hex.length - (hex.length === 8 ? 1 : 2) );
+
+                            // convert the hex alpha info to decimal then get the percentage (for jQuery Color)
+                            hexA = parseInt(lastSubStr, 16) / 255;
+                        }
+
+                        currentColor = $.Color(hex);
+                        currentColor = currentColor.alpha(hexA);
+
+                        break;
+
+                    case ColorFormats.RGBA:
+                        var rgbaR = $("#rgba-r-input").val();
+                        var rgbaG = $("#rgba-g-input").val();
+                        var rgbaB = $("#rgba-b-input").val();
+                        var rgbaA = $("#rgba-a-input").val();
+
+                        currentColor = $.Color(rgbaR, rgbaG, rgbaB, rgbaA);
+                        break;
+
+                    case ColorFormats.HSLA:
+                        var hslaH = $("#hsla-h-input").val();
+                        var hslaS = $("#hsla-s-input").val();
+                        var hslaL = $("#hsla-l-input").val();
+                        var hslaA = $("#hsla-a-input").val();
+
+                        currentColor = $.Color({ hue: hslaH, saturation: hslaS, lightness: hslaL });
+                        currentColor = currentColor.alpha(hslaA);
+                        break;
+                }
+
+                previousColor = currentColor;
+
+                var alpha = currentColor.alpha();
+                var alphaPercent = toPercent(alpha);
+
+                var red = currentColor.red();
+                var green = currentColor.green();
+                var blue = currentColor.blue();
+
+                var hue = currentColor.hue();
+                var saturation = currentColor.saturation();
+                var saturationPercent = toPercent(saturation);
+                var lightness = currentColor.lightness();
+                var lightnessPercent = toPercent(lightness);
+
+                // update all inputs
+                if (currentColorFormat !== ColorFormats.HEX)
+                {
+                    $("#hex-input").val( currentColor.toHexString(alpha !== 1).toUpperCase() );
+                }
+
+                if (currentColorFormat !== ColorFormats.RGBA)
+                {
+                    $("#rgba-r-input").val(red);
+                    $("#rgba-g-input").val(green);
+                    $("#rgba-b-input").val(blue);
+                    $("#rgba-a-input").val(alpha);
+                }
+
+                if (currentColorFormat !== ColorFormats.HSLA)
+                {
+                    $("#hsla-h-input").val(hue);
+                    $("#hsla-s-input").val(saturation);
+                    $("#hsla-l-input").val(lightness);
+                    $("#hsla-a-input").val(alpha);
+                }
+
+                // update all results
+                $(".color-preview").css("background-color", currentColor.toRgbaString());
+
+                $("#rgba-r-output").text(red);
+                $("#rgba-g-output").text(green);
+                $("#rgba-b-output").text(blue);
+                $("#rgba-a-output").text(alphaPercent);
+
+                $("#hsla-h-output").text(hue);
+                $("#hsla-s-output").text(saturationPercent);
+                $("#hsla-l-output").text(lightnessPercent);
+                $("#hsla-a-output").text(alphaPercent);
+            }
+
             $(function() {
-                // don't make a form refresh the page when 'enter' is hit
-                $("form").submit(function() {
-                    return false;
+                // start out with a random color by default for fun
+                $("#rgba-r-input").val( rand(0, 255) );
+                $("#rgba-g-input").val( rand(0, 255) );
+                $("#rgba-b-input").val( rand(0, 255) );
+
+                $.each($("input"), function(i, val)
+                {
+                    trackInput(val);
                 });
 
-                var currentColorInput = "rgba";
-
-                // every 25 milliseconds, update our color
-                setInterval(updateColor, 25);
-
                 // show the correct controls when a color button is clicked
-                $(".color-button").click(function()
+                $(".color-format-button").click(function()
                 {
-                    currentColorInput = $(this).data("type");
+                    currentColorFormat = $(this).data("type");
 
                     // remove all active buttons then add the class to the clicked button
-                    $(".color-button").removeClass("active");
+                    $(".color-format-button").removeClass("active");
                     $(this).addClass("active");
 
                     // hide all inputs then show the one we need
                     $(".color-inputs").hide();
-                    $(".color-inputs[data-type='" + currentColorInput + "']").show();
+                    $(".color-inputs[data-type='" + currentColorFormat + "']").show();
                 });
-
-                // select rgba color input type by default
-                $(".color-button[data-type='rgba']").click();
-
-                // start out with a random color by default for fun
-                $("#rgba-r-input").val(Math.floor(Math.random() * 255));
-                $("#rgba-g-input").val(Math.floor(Math.random() * 255));
-                $("#rgba-b-input").val(Math.floor(Math.random() * 255));
-
-                var oldColor;
-
-                // read the inputted color info and update
-                function updateColor()
-                {
-                    var color;
-
-                    // read the correct color input type (rgba, hsla, or hex)
-                    switch (currentColorInput)
-                    {
-                        case "hex":
-                            var hex = $("#hex-input").val();
-                            var hexA = 1;
-
-                            if (hex.charAt(0) !== '#')
-                            {
-                                hex = '#' + hex;
-                            }
-
-                            // if we have information about the alpha, use it
-                            if (hex.length === 8 || hex.length === 9)
-                            {
-                                // get the last 1 or 2 characters to get the alpha info
-                                var lastSubStr = hex.substr(hex.length - (hex.length === 8 ? 1 : 2));
-
-                                // convert the hex alpha info to decimal then get the percentage (for jQuery Color)
-                                hexA = parseInt(lastSubStr, 16) / 255;
-                            }
-
-                            color = $.Color(hex);
-                            color = color.alpha(hexA);
-
-                            break;
-
-                        case "rgba":
-                            var rgbaR = $("#rgba-r-input").val();
-                            var rgbaG = $("#rgba-g-input").val();
-                            var rgbaB = $("#rgba-b-input").val();
-                            var rgbaA = $("#rgba-a-input").val();
-
-                            color = $.Color(rgbaR, rgbaG, rgbaB, rgbaA);
-                            break;
-
-                        case "hsla":
-                            var hslaH = $("#hsla-h-input").val();
-                            var hslaS = $("#hsla-s-input").val();
-                            var hslaL = $("#hsla-l-input").val();
-                            var hslaA = $("#hsla-a-input").val();
-
-                            color = $.Color({ hue: hslaH, saturation: hslaS, lightness: hslaL });
-                            color = color.alpha(hslaA);
-                            break;
-                    }
-
-                    // if this color hasn't changed since last time, no need to update all the things
-                    if ( ! oldColor || color.toHexString(true) !== oldColor.toHexString(true))
-                    {
-                        oldColor = color;
-                    }
-                    else
-                    {
-                        return;
-                    }
-
-                    // update all inputs
-                    if (currentColorInput !== "hex")
-                    {
-                        $("#hex-input").val(color.toHexString(true).toUpperCase());
-                    }
-
-                    if (currentColorInput !== "rgba")
-                    {
-                        $("#rgba-r-input").val(color.red());
-                        $("#rgba-g-input").val(color.green());
-                        $("#rgba-b-input").val(color.blue());
-                        $("#rgba-a-input").val(color.alpha());
-                    }
-
-                    if (currentColorInput !== "hsla")
-                    {
-                        $("#hsla-h-input").val(color.hue());
-                        $("#hsla-s-input").val(color.saturation());
-                        $("#hsla-l-input").val(color.lightness());
-                        $("#hsla-a-input").val(color.alpha());
-                    }
-
-                    // update all results
-                    $(".color-bg").css("background-color", color.toRgbaString());
-                    $("#color-hex").text(color.toHexString(true).toUpperCase() + " / " + color.toHexString().toUpperCase());
-                    $("#color-rgba").text(color.toRgbaString());
-                    $("#color-hsla").text(color.toHslaString());
-
-                    $("#color-rgb-dec").text(
-                            "rgb dec(" +
-                            Math.round(color.red() / 255 * 10000) / 10000 + "," +
-                            Math.round(color.green() / 255 * 10000) / 10000 + "," +
-                            Math.round(color.blue() / 255 * 10000) / 10000 + ")"
-                    );
-                }
             });
         </script>
     </body>
