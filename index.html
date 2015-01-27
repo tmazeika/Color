@@ -22,6 +22,18 @@
                 padding: 0;
             }
 
+            table {
+                margin: auto;
+            }
+
+            input[type=text] {
+                border: none;
+            }
+
+            input[type=text]:focus {
+                box-shadow: 0 0 10px blue;
+            }
+
             .color-preview {
                 width: 100%;
                 height: 100%;
@@ -43,19 +55,29 @@
             .color-format-button {
                 background-color: #FFF;
                 border: none;
-                border-bottom: 3px solid rgba(0, 0, 0, .25);
-                border-radius: 3px;
                 color: #000;
                 cursor: pointer;
                 font-family: inherit;
                 font-size: inherit;
                 outline: none;
 
+                width: 33.33%;
+                float: left;
                 padding: .5em;
             }
 
+            .color-format-button:first-child {
+                border-top-left-radius: 3px;
+                border-bottom-left-radius: 3px;
+            }
+
+            .color-format-button:last-child {
+                border-top-right-radius: 3px;
+                border-bottom-right-radius: 3px;
+            }
+
             .color-format-button.active {
-                background-color: #B3DEFF;
+                background-color: #BED7E9;
             }
         </style>
 
@@ -65,19 +87,21 @@
     <body>
         <div class="color-preview">
             <div class="color-control-container">
-                <button class="color-format-button" data-type="hex">
-                    Hex
-                </button>
+                <header class="color-format-button-container">
+                    <button class="color-format-button" data-type="hex">
+                        Hex
+                    </button>
 
-                <button class="color-format-button active" data-type="rgba">
-                    RGBA
-                </button>
+                    <button class="color-format-button active" data-type="rgba">
+                        RGBA
+                    </button>
 
-                <button class="color-format-button" data-type="hsla">
-                    HSLA
-                </button>
+                    <button class="color-format-button" data-type="hsla">
+                        HSLA
+                    </button>
+                </header>
 
-                <br/><br/>
+                <br/><br/><br/>
 
                 <div class="color-inputs" data-type="hex" hidden>
                     <table>
@@ -86,8 +110,11 @@
                         </tr>
                         <tr>
                             <td>
-                                <input id="hex-input" onchange="updateColor()" value="#00000000"/>
+                                <input id="hex-input" type="text" onchange="updateColor()" value="#00000000"/>
                             </td>
+                        </tr>
+                        <tr>
+                            <td id="hex-output"></td>
                         </tr>
                     </table>
                 </div>
@@ -246,6 +273,8 @@
                 var alpha = currentColor.alpha();
                 var alphaPercent = toPercent(alpha);
 
+                var hex = currentColor.toHexString(alpha !== 1).toUpperCase();
+
                 var red = currentColor.red();
                 var green = currentColor.green();
                 var blue = currentColor.blue();
@@ -259,7 +288,7 @@
                 // update all inputs
                 if (currentColorFormat !== ColorFormats.HEX)
                 {
-                    $("#hex-input").val( currentColor.toHexString(alpha !== 1).toUpperCase() );
+                    $("#hex-input").val(hex);
                 }
 
                 if (currentColorFormat !== ColorFormats.RGBA)
@@ -281,6 +310,8 @@
                 // update all results
                 $(".color-preview").css("background-color", currentColor.toRgbaString());
 
+                $("#hex-output").text(hex);
+
                 $("#rgba-r-output").text(red);
                 $("#rgba-g-output").text(green);
                 $("#rgba-b-output").text(blue);
@@ -298,6 +329,15 @@
                 $("#rgba-g-input").val( rand(0, 255) );
                 $("#rgba-b-input").val( rand(0, 255) );
 
+                // initialize color
+                updateColor();
+
+                // lock the color control container dimensions
+                var colorControlContainer = $(".color-control-container");
+                colorControlContainer.css('width', colorControlContainer.css('width') );
+                colorControlContainer.css('height', colorControlContainer.css('height') );
+
+                // track input changes
                 $.each($("input"), function(i, val)
                 {
                     trackInput(val);
