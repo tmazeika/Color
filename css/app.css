@@ -1,0 +1,41 @@
+html, body {
+    color: #FFF;
+    font-family: sans-serif;
+    font-size: .9em;
+    text-align: center;
+    text-shadow: 0 0 1px #000;
+
+    margin: 0;
+    padding: 0;
+}
+
+.flex {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+
+.color-preview {
+    height: 100vh;
+}
+
+.controls-container {
+    height: 100vh;
+}
+
+.controls {
+    background-color: rgba(0, 0, 0, .5);
+    border-radius: 10px;
+
+    padding: 1em;
+}
+
+.controls > *:not(:last-child) {
+    margin-bottom: 1em;
+}
+
+.github-link {
+    position: absolute;
+    top: 1em;
+    right: 1em;
+}
