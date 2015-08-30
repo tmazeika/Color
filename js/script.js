@@ -90,13 +90,15 @@ $(function() {
 
     updateColor('rgb');
 
+    var setBeingUsed = function() {
+        $(this).data('being-changed', true);
+    };
+
     $('input[type=range]')
-        .on('mousedown', function() {
-            $(this).data('being-changed', true);
-        })
-        .on('mouseup', function() {
-            $(this).data('being-changed', false);
-        })
+        .data('being-changed', true)
+        .on('change', setBeingUsed)
+        .on('mousedown', setBeingUsed)
+        .on('mouseup', setBeingUsed)
         .each(function(i, input) {
             setInterval(function() {
                 var beingChanged = $(input).data('being-changed');
