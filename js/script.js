@@ -95,6 +95,7 @@ $(function() {
     };
 
     $('input[type=range]')
+        .data('being-changed', true)
         .on('change', setBeingUsed)
         .on('mousedown', setBeingUsed)
         .on('mouseup', setBeingUsed)

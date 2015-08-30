@@ -1,10 +1,4 @@
-html, body {
-    color: #FFF;
-    font-family: sans-serif;
-    font-size: .9em;
-    text-align: center;
-    text-shadow: 0 0 1px #000;
-
+body {
     margin: 0;
     padding: 0;
 }
@@ -25,13 +19,21 @@ html, body {
 
 .controls {
     background-color: rgba(0, 0, 0, .5);
-    border-radius: 10px;
+    color: #FFF;
+    font-family: sans-serif;
+    font-size: .8em;
+    text-align: center;
+    text-shadow: 0 0 1px #000;
 
     padding: 1em;
 }
 
 .controls > *:not(:last-child) {
     margin-bottom: 1em;
+}
+
+.controls input {
+    width: 90%;
 }
 
 .github-link {
