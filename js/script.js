@@ -76,18 +76,18 @@ var HSL = function(h, s, l) {
 HSL.prototype.toRGB = function() {
     var _ = math,
         c = _.multiply(_.subtract(frac(1), _.abs(_.subtract(_.multiply(frac(2), this.l), frac(1)))), this.s),
-        x = _.multiply(c, _.subtract(1, _.abs(_.subtract(_.mod(_.divide(this.h, frac(60)), frac(2)), 1)))),
+        x = _.multiply(c, _.subtract(1, _.abs(_.subtract(_.mod(_.divide(this.h, frac(60)), frac(2)), frac(1))))),
         m = _.subtract(this.l, _.divide(c, frac(2))),
-        rgb = [0, 0, 0];
+        rgb = [frac(0), frac(0), frac(0)];
 
-    if      (between(0  , 60 )) rgb = [c, x, 0];
-    else if (between(60 , 120)) rgb = [x, c, 0];
-    else if (between(120, 180)) rgb = [0, c, x];
-    else if (between(180, 240)) rgb = [0, x, c];
-    else if (between(240, 300)) rgb = [x, 0, c];
-    else if (between(300, 360)) rgb = [c, 0, x];
+    if      (between(0  , 60 )) rgb = [c, x, frac(0)];
+    else if (between(60 , 120)) rgb = [x, c, frac(0)];
+    else if (between(120, 180)) rgb = [frac(0), c, x];
+    else if (between(180, 240)) rgb = [frac(0), x, c];
+    else if (between(240, 300)) rgb = [x, frac(0), c];
+    else if (between(300, 360)) rgb = [c, frac(0), x];
 
-    return new RGB(_.add(rgb[0], m), _.add(rgb[1], m), _.add(rgb[2], m));
+    return new RGB(_.multiply(_.add(rgb[0], m), frac(255)), _.multiply(_.add(rgb[1], m), frac(255)), _.multiply(_.add(rgb[2], m), frac(255)));
 };
 
 var Hex = function(value) {
@@ -119,7 +119,28 @@ Hex.prototype.toRGB = function() {
     return new RGB(this.value >> 16, this.value >> 8 & 0xFF, this.value & 0xFF);
 };
 
+function pad0(str, count) {
+    if (str.length >= count) {
+        return str;
+    }
+    else {
+        var newStr = '';
+
+        for (var i = 0; i < count; i++) {
+            newStr += '0';
+        }
+
+        return newStr.substring(0, newStr.length - str.length)
+    }
+}
+
 Hex.prototype.toString = function() {
+    var str = '';
+
+    str += pad0((this.value >> 16).toString(16), 2);
+    str += pad0((this.value >> 8 & 0xFF).toString(16), 2);
+    str += pad0((this.value & 0xFF).toString(16));
+
     return this.value.toString(16);
 };
 
@@ -184,7 +205,6 @@ function update(changedType) {
     }
 
     if (changedType !== 'rgb') {
-        console.log(rgb.r.toString());
         $('#rgb-r-input').val(rgb.r.toString());
         $('#rgb-g-input').val(rgb.g.toString());
         $('#rgb-b-input').val(rgb.b.toString());
@@ -201,9 +221,9 @@ function update(changedType) {
     $('#rgb-g-output').text(rgb.g.toString());
     $('#rgb-b-output').text(rgb.b.toString());
 
-    $('#hsl-h-output').text(hsl.h.toString());
-    $('#hsl-s-output').text(hsl.s.toString());
-    $('#hsl-l-output').text(hsl.l.toString());
+    $('#hsl-h-output').text(math.format(hsl.h, {precision: 0}));
+    $('#hsl-s-output').text(math.format(hsl.s, {precision: 0}));
+    $('#hsl-l-output').text(math.format(hsl.l, {precision: 0}));
 
     // update color preview
     $('.color-preview').css('background-color', 'rgb(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ')');
