@@ -139,9 +139,9 @@ Hex.prototype.toString = function() {
 
     str += pad0((this.value >> 16).toString(16), 2);
     str += pad0((this.value >> 8 & 0xFF).toString(16), 2);
-    str += pad0((this.value & 0xFF).toString(16));
+    str += pad0((this.value & 0xFF).toString(16), 2);
 
-    return this.value.toString(16);
+    return str;
 };
 
 window.onload = function() {
@@ -152,8 +152,12 @@ var sliders = $('input[type=range]');
 
 function checkForChange() {
     sliders.each(function(i, slider) {
+        // if the slider was affected by the last update, but not manually changed...
+        if ($(slider).data('affected')) {
+            $(slider).data('affected', false);
+        }
         // if the value has changed since the last update...
-        if ($(slider).data('update-value') !== $(slider).val()) {
+        else if ($(slider).data('update-value') !== $(slider).val()) {
             $(slider).data('update-value', $(slider).val());
             update($(slider).closest('.input-container').data('type'));
         }
@@ -174,6 +178,8 @@ function update(changedType) {
         hslS = $('#hsl-s-input').val(),
         hslL = $('#hsl-l-input').val(),
         hexV = $('#hex-input').val();
+
+    console.log(rgbR, rgbG, rgbB, hslH, hslS, hslL, hexV);
 
     switch (changedType) {
         case 'rgb':
@@ -201,19 +207,19 @@ function update(changedType) {
     }
 
     if (changedType !== 'hex') {
-        $('#hex-input').val('#' + hex.toString());
+        $('#hex-input').val('#' + hex.toString()).data('affected', true);
     }
 
     if (changedType !== 'rgb') {
-        $('#rgb-r-input').val(rgb.r.toString());
-        $('#rgb-g-input').val(rgb.g.toString());
-        $('#rgb-b-input').val(rgb.b.toString());
+        $('#rgb-r-input').val(rgb.r.toString()).data('affected', true);
+        $('#rgb-g-input').val(rgb.g.toString()).data('affected', true);
+        $('#rgb-b-input').val(rgb.b.toString()).data('affected', true);
     }
 
     if (changedType !== 'hsl') {
-        $('#hsl-h-input').val(hsl.h.toString());
-        $('#hsl-s-input').val(hsl.s.toString());
-        $('#hsl-l-input').val(hsl.l.toString());
+        $('#hsl-h-input').val(hsl.h.toString()).data('affected', true);
+        $('#hsl-s-input').val(hsl.s.toString()).data('affected', true);
+        $('#hsl-l-input').val(hsl.l.toString()).data('affected', true);
     }
 
     // update all outputs
