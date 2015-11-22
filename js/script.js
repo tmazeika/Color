@@ -1,122 +1,213 @@
-var rgb = {
-    r: 0,
-    g: 0,
-    b: 0,
+//var rgbToHSLCode = fMath.parse(
+//    'R = R/255;' +
+//    'G = G/255;' +
+//    'B = B/255;' +
+//    'cMax = max(R, G, B);' +
+//    'cMin = min(R, G, B);' +
+//    'deltaC = cMax - cMin;' +
+//    'H = (deltaC == 0) ? 0' +
+//    '  : (cMax   == r) ? 60 * (((G - B)/deltaC) % 6)' +
+//    '  : (cMax   == g) ? 60 * (((B - R)/deltaC) + 2)' +
+//    '  : (cMax   == b) ? 60 * (((R - G)/deltaC) + 4)' +
+//    '  : 0;' +
+//    'S = (deltaC == 0) ? 0 : deltaC/(1 - abs(2 * L - 1));' +
+//    'L = (cMax + cMin)/2').compile();
+//
+//var hslToRGBCode = fMath.parse(
+//    'C = (1 - abs(2 * L - 1)) * S;' +
+//    'X = C * (1 - abs((H/60) % 2 - 1));' +
+//    'M = L - C/2;' +
+//    '  (H >= 0   and H <  60) ? (rgb = [C, X, 0])' +
+//    ': (H >= 60  and H < 120) ? (rgb = [X, C, 0])' +
+//    ': (H >= 120 and H < 180) ? (rgb = [0, C, X])' +
+//    ': (H >= 180 and H < 240) ? (rgb = [0, X, C])' +
+//    ': (H >= 240 and H < 300) ? (rgb = [X, 0, C])' +
+//    ': (H >= 300 and H < 360) ? (rgb = [C, 0, X])' +
+//    ': 0;' +
+//    'rgb = rgb + M;' +
+//    'R = rgb[1];' +
+//    'G = rgb[2];' +
+//    'B = rgb[3];').compile();
 
-    create: function(r, g, b) {
-        var o = Object.create(this);
+function frac(n, d) {
+    return math.fraction(n, d || 1);
+}
 
-        o.r = r;
-        o.g = g;
-        o.b = b;
+function between(x, min, max) {
+    return math.largerEq(x, frac(min)) && math.smaller(frac(max));
+}
 
-        return o;
-    }
+var RGB = function(r, g, b) {
+    this.r = r;
+    this.g = g;
+    this.b = b;
 };
 
-var hsl = {
-    h: 0,
-    s: 0,
-    l: 0,
+RGB.prototype.toHSL = function() {
+    var _ = math,
+        r = _.divide(this.r, frac(255)),
+        g = _.divide(this.g, frac(255)),
+        b = _.divide(this.b, frac(255)),
+        cMax = _.max(r, g, b),
+        cMin = _.min(r, g, b),
+        deltaC = _.subtract(cMax, cMin),
+        h = _.equal(deltaC, 0) ? frac(0)
+            : _.equal(cMax, r) ? _.multiply(frac(60), _.mod(_.divide(_.subtract(g, b), deltaC), frac(6)))
+            : _.equal(cMax, g) ? _.multiply(frac(60), _.add(_.divide(_.subtract(b, r), deltaC), frac(2)))
+            : _.equal(cMax, b) ? _.multiply(frac(60), _.add(_.divide(_.subtract(r, g), deltaC), frac(4)))
+            : frac(0),
+        l = _.divide(_.add(cMax, cMin), frac(2)),
+        s = _.equal(deltaC, 0) ? frac(0)
+            : _.divide(deltaC, _.subtract(frac(1), _.abs(_.subtract(_.multiply(frac(2), l), frac(1)))));
 
-    create: function(h, s, l) {
-        var o = Object.create(this);
-
-        o.h = h;
-        o.s = s;
-        o.l = l;
-
-        return 0;
-    },
-
-    toRGB: function() {
-        var c = (1 - Math.abs(2 * this.l)) * this.s,
-            x = c * (1 - Math.abs(this.h / 60) % 2 - 1),
-            m = this.l - c / 2;
-
-        var r, g, b;
-
-        if (this.h >= 0 && this.h < 60) {
-            r = c; g = x; b = 0;
-        }
-        else if (this.h >= 60 && this.h < 120) {
-            r = x; g = c; b = 0;
-        }
-        else if (this.h >= 120 && this.h < 180) {
-            r = 0; g = c; b = x;
-        }
-        else if (this.h >= 180 && this.h < 240) {
-            r = 0; g = x; b = c;
-        }
-        else if (this.h >= 240 && this.h < 300) {
-            r = x; g = 0; b = c;
-        }
-        else if (this.h >= 300 && this.h < 360) {
-            r = c; g = 0; b = x;
-        }
-
-        return rgb.create(r + m, g + m, b + m);
-    },
-
-    toHex: function() {
-        var rgb = this.toRGB(),
-            str = rgb.r.toString(16) + rgb.g.toString(16) + rgb.b.toString(16);
-        return hex.parse(str);
-    }
+    return new HSL(h, s, l);
 };
 
-var hex = {
-    r: 0,
-    g: 0,
-    b: 0,
+RGB.prototype.toHex = function() {
+    return new Hex(this.b | (this.g << 8) | (this.r << 16));
+};
 
-    create: function(r, g, b) {
-        var o = Object.create(this);
+var HSL = function(h, s, l) {
+    this.h = h;
+    this.s = s;
+    this.l = l;
+};
 
-        o.r = r || 0;
-        o.g = g || 0;
-        o.b = b || 0;
+HSL.prototype.toRGB = function() {
+    var _ = math,
+        c = _.multiply(_.subtract(frac(1), _.abs(_.subtract(_.multiply(frac(2), this.l), frac(1)))), this.s),
+        x = _.multiply(c, _.subtract(1, _.abs(_.subtract(_.mod(_.divide(this.h, frac(60)), frac(2)), 1)))),
+        m = _.subtract(this.l, _.divide(c, frac(2))),
+        rgb = [0, 0, 0];
 
-        return this;
-    },
+    if      (between(0  , 60 )) rgb = [c, x, 0];
+    else if (between(60 , 120)) rgb = [x, c, 0];
+    else if (between(120, 180)) rgb = [0, c, x];
+    else if (between(180, 240)) rgb = [0, x, c];
+    else if (between(240, 300)) rgb = [x, 0, c];
+    else if (between(300, 360)) rgb = [c, 0, x];
 
-    parse: function(str) {
-        var r, g, b;
+    return new RGB(_.add(rgb[0], m), _.add(rgb[1], m), _.add(rgb[2], m));
+};
 
-        if (str.length > 0) {
-            var raw = str[0] === '#' ? str.substring(1) : str;
+var Hex = function(value) {
+    if (typeof value === 'string') {
+        if (value.length !== 0) {
+            if (value[0] === '#') {
+                value = value.substring(1);
+            }
 
-            if (raw.length === 3 || raw.length === 6) {
-                if (raw.length === 3) {
-                    r = parseInt(raw[0], 16);
-                    g = parseInt(raw[1], 16);
-                    b = parseInt(raw[2], 16);
-                }
-                else if (raw.length === 6) {
-                    r = parseInt(raw.substring(0, 1), 16);
-                    g = parseInt(raw.substring(1, 2), 16);
-                    b = parseInt(raw.substring(2, 3), 16);
-                }
+            if (value.length === 3) {
+                // expands 'FFF' to 'FFFFFF', for example
+                value = value[0] + value[0] + value[1] + value[1] + value[2] + value[2];
+            }
 
-                return hex.create(r, g, b);
+            if (value.length !== 3 || value.length !== 6) {
+                this.value = 0;
+            }
+            else {
+                this.value = parseInt(value, 16);
             }
         }
-
-        return hex.create();
-    },
-
-    toRGB: function() {
-        return rgb.create(this.r, this.g, this.b);
-    },
-
-    toHSL: function() {
-        // TODO
-    },
-
-    toString: function() {
-        return '#' + this.r.toString(16) + this.g.toString(16) + this.b.toString(16);
+    }
+    else {
+        this.value = value;
     }
 };
+
+Hex.prototype.toRGB = function() {
+    return new RGB(this.value >> 16, this.value >> 8 & 0xFF, this.value & 0xFF);
+};
+
+Hex.prototype.toString = function() {
+    return this.value.toString(16);
+};
+
+window.onload = function() {
+    checkForChange();
+};
+
+var sliders = $('input[type=range]');
+
+function checkForChange() {
+    sliders.each(function(i, slider) {
+        // if the value has changed since the last update...
+        if ($(slider).data('update-value') !== $(slider).val()) {
+            $(slider).data('update-value', $(slider).val());
+            update($(slider).closest('.input-container').data('type'));
+        }
+    });
+
+    requestAnimationFrame(checkForChange);
+}
+
+var rgb = new RGB();
+var hsl = new HSL();
+var hex = new Hex();
+
+function update(changedType) {
+    var rgbR = $('#rgb-r-input').val(),
+        rgbG = $('#rgb-g-input').val(),
+        rgbB = $('#rgb-b-input').val(),
+        hslH = $('#hsl-h-input').val(),
+        hslS = $('#hsl-s-input').val(),
+        hslL = $('#hsl-l-input').val(),
+        hexV = $('#hex-input').val();
+
+    switch (changedType) {
+        case 'rgb':
+            rgb.r = frac(rgbR);
+            rgb.g = frac(rgbG);
+            rgb.b = frac(rgbB);
+
+            hsl = rgb.toHSL();
+            hex = rgb.toHex();
+            break;
+        case 'hsl':
+            hsl.h = frac(hslH);
+            hsl.s = frac(hslS, 100);
+            hsl.l = frac(hslL, 100);
+
+            rgb = hsl.toRGB();
+            hex = rgb.toHex();
+            break;
+        case 'hex':
+            hex = new Hex(hexV);
+
+            rgb = hex.toRGB();
+            hsl = rgb.toHSL();
+            break;
+    }
+
+    if (changedType !== 'hex') {
+        $('#hex-input').val('#' + hex.toString());
+    }
+
+    if (changedType !== 'rgb') {
+        console.log(rgb.r.toString());
+        $('#rgb-r-input').val(rgb.r.toString());
+        $('#rgb-g-input').val(rgb.g.toString());
+        $('#rgb-b-input').val(rgb.b.toString());
+    }
+
+    if (changedType !== 'hsl') {
+        $('#hsl-h-input').val(hsl.h.toString());
+        $('#hsl-s-input').val(hsl.s.toString());
+        $('#hsl-l-input').val(hsl.l.toString());
+    }
+
+    // update all outputs
+    $('#rgb-r-output').text(rgb.r.toString());
+    $('#rgb-g-output').text(rgb.g.toString());
+    $('#rgb-b-output').text(rgb.b.toString());
+
+    $('#hsl-h-output').text(hsl.h.toString());
+    $('#hsl-s-output').text(hsl.s.toString());
+    $('#hsl-l-output').text(hsl.l.toString());
+
+    // update color preview
+    $('.color-preview').css('background-color', 'rgb(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ')');
+}
 
 /*
 function rand(min, max)

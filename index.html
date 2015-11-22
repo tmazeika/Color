@@ -48,12 +48,12 @@
                         </div>
                         <div>
                             <div>Saturation</div>
-                            <input id="hsl-s-input" type="range" value="0" min="0" max="1" step="0.01"/>
+                            <input id="hsl-s-input" type="range" value="0" min="0" max="100" step="1"/>
                             <div id="hsl-s-output"></div>
                         </div>
                         <div>
                             <div>Lightness</div>
-                            <input id="hsl-l-input" type="range" value="0" min="0" max="1" step="0.01"/>
+                            <input id="hsl-l-input" type="range" value="0" min="0" max="100" step="1"/>
                             <div id="hsl-l-output"></div>
                         </div>
                     </section>
@@ -68,6 +68,8 @@
             </div>
         </div>
 
+        <script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/2.4.2/math.min.js"></script>
         <script src="js/script.js"></script>
     </body>
 
